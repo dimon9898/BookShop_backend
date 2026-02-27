@@ -6,6 +6,11 @@ services:
     container_name: fastapi_container
     env_file:
       - .env
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/'] 
+      interval: 10s
+      timeout: 5s
+      retries: 5 
     ports:
       - "8000:8000"
     restart: always 
@@ -21,4 +26,5 @@ services:
     restart: always
 
     depends_on:
-      - fastapi    
+      fastapi:
+        condition: service_healthy    
