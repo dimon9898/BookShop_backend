@@ -13,8 +13,24 @@ services:
       retries: 5 
     ports:
       - "8000:8000"
+    depends_on:
+      - db
+    
     restart: always 
 
+
+  db:
+    image: postgres:15    
+    container_name: db_container
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_NAME: ${DB_NAME}
+
+    volumes:
+      - postgres_data:/var/lib/postgres/data  
+    
+    restart: always
 
   nginx:
     image: nginx
