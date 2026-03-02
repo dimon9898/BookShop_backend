@@ -35,3 +35,4 @@ class CartItem(BaseModel):
     book: BookSchema
 
     model_config = ConfigDict(from_attributes=True)
+

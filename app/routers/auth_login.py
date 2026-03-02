@@ -23,7 +23,7 @@ async def register(form: RegisterForm, db: AsyncSession = Depends(get_db)):
 
     if user:
         raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail='Пользователь с таким именем уже существует!'
         )
     

@@ -3,15 +3,29 @@ from fastapi import APIRouter, HTTPException, status, Depends
 
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from database.models import UserModel, BookModel, CartModel, OrderModel, OrderItem
 from database.db_init import get_db
-from app.schemes.order_schema import OrderSchema, OrderItemSchema, BookSchema
+from app.schemes.order_schema import OrderSchema, OrderItemSchema, BookSchema, PaymentResponse
 from app.auth import get_current_buyer
+from app.checkout import create_payment_url
 
 
 router = APIRouter(prefix='/order', tags=['Заказы'])
+
+
+async def _get_created_order(db: AsyncSession, order_id):
+    result = await db.scalars(select(OrderModel)
+                              .options(selectinload(OrderModel.items)
+                                       .selectinload(OrderItem.book))
+                              .where(OrderModel.id == order_id))
+    order = result.first()
+
+    return order
+
+
+
 
 
 @router.get('/list', response_model=list[OrderSchema], status_code=status.HTTP_200_OK)
@@ -68,6 +82,23 @@ async def create_order(db: AsyncSession = Depends(get_db), current_buyer: UserMo
     db.add(new_order)
 
     try:
-        pass
+        await db.flush()
+        payment = await create_payment_url(db, new_order.id)
     except Exception as e:
-        pass        
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f'Ошибка при создание платежа: {e}'
+        )       
+    
+
+    new_order.payment_status = payment.get('status')
+    new_order.payment_id = payment.get('id')
+
+
+    await db.execute(delete(CartModel).where(CartModel.buyer_id == current_buyer.id))
+    await db.commit()
+
+
+    order = await _get_created_order(db, new_order.id)
+
+    return PaymentResponse(order=order, confirmation_url=payment.get('confirmation_url'))

@@ -33,7 +33,7 @@ class OrderSchema(BaseModel):
     payment_id: str
     created_at: datetime
     updated_at: datetime
-    paid_at: datetime
+    paid_at: datetime | None = None
 
     items: list[OrderItemSchema]
     
@@ -41,3 +41,7 @@ class OrderSchema(BaseModel):
 
 
 
+
+class PaymentResponse(BaseModel):
+    order: OrderSchema
+    confirmation_url: str

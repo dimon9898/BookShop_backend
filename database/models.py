@@ -67,7 +67,7 @@ class OrderModel(Base):
     buyer_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     total_price: Mapped[float] = mapped_column(Numeric(10, 2))
     payment_status: Mapped[str] = mapped_column(String(20), default='pending')
-    payment_id: Mapped[str] = mapped_column(String(128))
+    payment_id: Mapped[str] = mapped_column(String(128), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.now, onupdate=datetime.now)
     paid_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
