@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8000/'] 
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/').status"]
       interval: 10s
       timeout: 5s
       retries: 5 
