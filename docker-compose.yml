@@ -45,3 +45,8 @@ services:
     depends_on:
       fastapi:
         condition: service_healthy    
+
+
+
+volumes:
+  - postgres_data
