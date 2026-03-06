@@ -1,5 +1,5 @@
 from pydantic_settings import SettingsConfigDict, BaseSettings
-from pydantic import SecretStr, computed_field
+from pydantic import SecretStr, computed_field, field_validator
 
 
 
@@ -12,6 +12,16 @@ class Setting(BaseSettings):
     SECRET_KEY: SecretStr
     ALGORITHM: str
     TOKEN_MINUTE: float
+    ALLOWED_IPS: str
+
+
+    @field_validator('ALLOWED_IPS', mode='after')
+    @classmethod
+    def ip_white_list(cls, value: str) -> list[str]:
+        return [ip.strip() for ip in value.split(',')]
+
+
+
     @computed_field
     @property
     def db_url(self) -> str:

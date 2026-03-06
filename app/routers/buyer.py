@@ -8,6 +8,8 @@ from database.models import UserModel, BookModel, CartModel
 from database.db_init import get_db
 from app.schemes.buyer_schema import BookSchema, CartItem
 from app.auth import get_current_buyer
+from logger_init import logger
+
 
 router = APIRouter(prefix='/buyer', tags=['Эндпоинты покупателя'])
 
@@ -22,6 +24,7 @@ async def get_all_books(db: AsyncSession = Depends(get_db)):
 
     if not books:
         return []
+
 
     return books
 

@@ -2,10 +2,12 @@ from anyio import to_thread
 from decimal import Decimal
 import uuid
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 from yookassa import Payment, Configuration
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from database.models import OrderModel, OrderItem
+from logger_init import logger
 
 
 
@@ -85,3 +87,41 @@ async def create_payment_url(db: AsyncSession, order_id: int):
 
     
 
+
+async def update_payment_data(db: AsyncSession, object_data: dict):
+    try:
+
+        metadata = object_data.get('metadata')
+
+        if not metadata:
+            logger.error('metadata не найдена')
+            return False
+
+
+        order_id = metadata.get('order_id')
+
+        if not order_id:
+            logger.error('order_id не существует в metadata')
+            return False
+
+        result = await db.scalars(select(OrderModel).where(OrderModel.id == order_id))
+        order = result.first()
+
+        if not order:
+            logger.error(f'Такой заказ #{order_id} не существует в БД')
+            return False
+        
+
+        order.payment_status = object_data.get('status')
+
+        await db.commit()
+        return True
+    
+    except SQLAlchemyError as e:
+        logger.error(f'Ошибка в БД: {e}')
+        await db.rollback()
+        return False
+    except Exception as e:
+        logger.error(f'Неизвестная ошибка: {e}')
+        await db.rollback()
+        return False    
