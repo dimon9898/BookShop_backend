@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from anyio import to_thread
 from decimal import Decimal
 import uuid
@@ -113,6 +114,7 @@ async def update_payment_data(db: AsyncSession, object_data: dict):
         
 
         order.payment_status = object_data.get('status')
+        order.paid_at = datetime.now(timezone.utc)
 
         await db.commit()
         return True
