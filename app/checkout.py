@@ -1,7 +1,7 @@
+import uuid
 from datetime import datetime, timezone
 from anyio import to_thread
 from decimal import Decimal
-import uuid
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from yookassa import Payment, Configuration
@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from database.models import OrderModel, OrderItem
 from logger_init import logger
-
+from config import settings
 
 
 async def _get_order(db: AsyncSession, order_id: int):
@@ -27,8 +27,8 @@ async def _get_order(db: AsyncSession, order_id: int):
 
 async def create_payment_url(db: AsyncSession, order_id: int):
 
-    Configuration.account_id = 1170930
-    Configuration.secret_key = 'test_LU9k61vQGvLthduudL-80i83_BXhIEvc_c35Z5FmdEk'
+    Configuration.account_id = settings.YOOKASSA_CLIENT_ID
+    Configuration.secret_key = settings.YOOKASSA_SECRET_KEY
 
     items = []
 

@@ -13,6 +13,8 @@ class Setting(BaseSettings):
     ALGORITHM: str
     TOKEN_MINUTE: float
     ALLOWED_IPS: str
+    YOOKASSA_CLIENT_ID: int
+    YOOKASSA_SECRET_KEY: str
 
 
     @field_validator('ALLOWED_IPS', mode='after')
