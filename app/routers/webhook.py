@@ -55,7 +55,7 @@ async def payment_webhook(request: Request, background_task: BackgroundTasks, db
 
     if response['event'] == 'payment.succeeded':
         object_data = response.get('object')
-        await background_task.add_task(update_payment_data, db, object_data)
+        background_task.add_task(update_payment_data, db, object_data)
     
 
     return {'ok': True}
