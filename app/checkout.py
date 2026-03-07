@@ -98,7 +98,7 @@ async def update_payment_data(db: AsyncSession, object_data: dict):
             return False
 
 
-        order_id = metadata.get('order_id')
+        order_id = int(metadata.get('order_id'))
 
         if not order_id:
             logger.error('order_id не существует в metadata')
